@@ -37,7 +37,10 @@
     color: #1d8731;
     text-align: center;
     transition: opacity 0.5s ease;
-  }
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
 
   #rotateOverlay img {
     width: 120px;
@@ -94,6 +97,28 @@ body.mobile-mode .ig-fab {
   width: 56px;
   height: 56px;
 }
+
+ /* Apenas visível em mobile paisagem */
+  #zoom-controls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: none; /* só aparece quando ativado pelo JS */
+    flex-direction: column;
+    gap: 5px;
+    z-index: 9999;
+  }
+
+  #zoom-controls button {
+    font-size: 18px;
+    padding: 5px 8px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    pointer-events: auto; /* garante que os botões sejam clicáveis */
+  }
+
 
 body.mobile-mode .contact-fab {
   bottom: 16px;
@@ -295,6 +320,13 @@ body.mobile-mode footer {
   </header>
 
   <div class="spacer"></div>
+
+  <!-- Botões de zoom (apenas para mobile em paisagem) -->
+<div id="zoom-controls">
+  <button id="zoom-in">🔍+</button>
+  <button id="zoom-out">🔍-</button>
+</div>
+
 
   <!-- TOP SLIDESHOW -->
   <div class="top-slide-wrap">
@@ -660,5 +692,122 @@ Sustentável</h2>
 </script>
 
   </script>
+  <script>
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  function handleOrientation() {
+    const overlay = document.getElementById('rotateOverlay');
+    const body = document.body;
+
+    if (!isMobile()) {
+      // Notebook: não faz nada
+      overlay.style.display = 'none';
+      body.classList.remove('mobile-mode');
+      document.documentElement.style.zoom = '100%';
+      return;
+    }
+
+    // Celular
+    body.classList.add('mobile-mode');
+
+    if (window.innerWidth > window.innerHeight) {
+      // Paisagem — mostrar overlay e reduzir zoom
+      overlay.style.display = 'flex';
+      document.documentElement.style.zoom = '90%'; // diminui um pouco o site
+    } else {
+      // Retrato — esconde overlay e mantém zoom normal
+      overlay.style.display = 'none';
+      document.documentElement.style.zoom = '100%';
+    }
+  }
+
+  window.addEventListener('resize', handleOrientation);
+  window.addEventListener('orientationchange', handleOrientation);
+  window.addEventListener('load', handleOrientation);
+  document.documentElement.style.zoom = '90%';
+
+  // Detecção de dispositivo móvel
+  (function(){
+    const overlay = document.getElementById('rotateOverlay');
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if(isMobile){
+      function checkOrientation(){
+        if(window.innerHeight > window.innerWidth){
+          // retrato — mostra overlay
+          overlay.style.display = 'flex';
+        } else {
+          // paisagem — esconde overlay
+          overlay.style.display = 'none';
+        }
+      }
+
+      window.addEventListener('resize', checkOrientation);
+      window.addEventListener('orientationchange', checkOrientation);
+      checkOrientation();
+    }
+  })();
+
+  // Exemplo de gráfico Chart.js (Resultados)
+  const ctx = document.getElementById('waterChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Controle Manual', 'CI-10'],
+      datasets: [{
+        label: 'Consumo de Água (litros)',
+        data: [1000, 600],
+        backgroundColor: ['#b76b1d', '#1d8731']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // Scroll animations
+  const observers = document.querySelectorAll('[data-animate], section, .media-card, .member, .preview, .info-card');
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.2 });
+  observers.forEach(o=>observer.observe(o));
+
+    const zoomControls = document.getElementById('zoom-controls');
+  const zoomIn = document.getElementById('zoom-in');
+  const zoomOut = document.getElementById('zoom-out');
+  const mainContent = document.body; // ou um container específico
+
+  // Função para detectar mobile em paisagem
+  function checkMobileLandscape() {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isLandscape = window.innerWidth > window.innerHeight;
+    if (isMobile && isLandscape) {
+      zoomControls.style.display = 'flex';
+    } else {
+      zoomControls.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('resize', checkMobileLandscape);
+  window.addEventListener('load', checkMobileLandscape);
+
+  let currentFontSize = parseInt(window.getComputedStyle(mainContent).fontSize);
+
+  zoomIn.addEventListener('click', () => {
+    currentFontSize += 2; // aumenta 2px por clique (ou muda para 10px se preferir)
+    mainContent.style.fontSize = currentFontSize + 'px';
+  });
+
+  zoomOut.addEventListener('click', () => {
+    currentFontSize -= 2;
+    mainContent.style.fontSize = currentFontSize + 'px';
+  });
+
+</script>
 </body>
 </html>
