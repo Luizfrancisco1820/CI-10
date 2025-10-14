@@ -11,6 +11,7 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+
   <style>
     :root{
       --primary:#1d8731;
@@ -21,6 +22,39 @@
       --trans: 420ms cubic-bezier(.2,.9,.2,1);
       --shadow: 0 18px 48px rgba(7,20,15,0.06);
     }
+
+
+    #rotateOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.95);
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: "Poppins", sans-serif;
+    color: #1d8731;
+    text-align: center;
+    transition: opacity 0.5s ease;
+  }
+
+  #rotateOverlay img {
+    width: 120px;
+    height: auto;
+    opacity: 0.9;
+    animation: rotatePhone 2s linear infinite;
+    margin-bottom: 16px;
+  }
+
+@keyframes rotatePhone {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(90deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(90deg); }
+    100% { transform: rotate(0deg); }
+  }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -34,6 +68,43 @@
       scroll-behavior:smooth;
       cursor: auto;
     }
+
+    /* ====== Ajustes inteligentes para modo celular ====== */
+body.mobile-mode header nav {
+  display: none; /* Esconde o menu grande */
+}
+
+body.mobile-mode header {
+  justify-content: space-between;
+}
+
+body.mobile-mode .irrigador-section,
+body.mobile-mode .gallery,
+body.mobile-mode section {
+  padding: 10px;
+  margin: 40px auto;
+}
+
+body.mobile-mode .preview img {
+  height: auto;
+  border-radius: 10px;
+}
+
+body.mobile-mode .ig-fab {
+  width: 56px;
+  height: 56px;
+}
+
+body.mobile-mode .contact-fab {
+  bottom: 16px;
+  left: 16px;
+}
+
+body.mobile-mode footer {
+  font-size: 12px;
+  padding: 16px;
+}
+
 
     /* PRELOADER */
     .preloader {
@@ -186,6 +257,13 @@
 </head>
 <body>
 
+  <div id="rotateOverlay">
+  <img src="https://cdn-icons-png.flaticon.com/512/84/84136.png" alt="Gire o celular" />
+  <h2>Por favor, vire seu celular</h2>
+  <p>Para melhor visualização, utilize o modo paisagem 🌿</p>
+</div>
+
+
   <!-- PRELOADER -->
   <div class="preloader" id="preloader">
     <div class="box">
@@ -304,6 +382,8 @@ Sustentável</h2>
         <div class="media-card"><img src="img/banner.jpg" alt="Banner do Projeto"><div class="meta">Banner para apresentação</div></div>
       </div>
     </section>
+
+    
 
     <!-- IMPACT & BENEFITS -->
     <section id="impact">
@@ -508,6 +588,28 @@ Sustentável</h2>
       targets.forEach(t => obs.observe(t));
     })();
 
+    // ======== ADAPTADOR INTELIGENTE PARA CELULAR ========
+(function(){
+  function ajustarParaCelular(){
+    const largura = window.innerWidth;
+    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent) || largura < 820;
+    const body = document.body;
+
+    if(isMobile){
+      body.classList.add("mobile-mode");
+      console.log("✅ Modo celular ativado (IA responsiva)");
+    } else {
+      body.classList.remove("mobile-mode");
+      console.log("💻 Modo desktop detectado");
+    }
+  }
+
+  // Detecta ao carregar e redimensionar
+  ajustarParaCelular();
+  window.addEventListener("resize", ajustarParaCelular);
+})();
+
+
     // Chart.js: water savings
     (function(){
       const ctx = document.getElementById('waterChart').getContext('2d');
@@ -530,6 +632,33 @@ Sustentável</h2>
         }
       });
     })();
+
+    function isMobileDevice() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  const overlay = document.getElementById('rotateOverlay');
+
+  function checkOrientation() {
+    if (isMobileDevice()) {
+      if (window.matchMedia("(orientation: portrait)").matches) {
+        overlay.style.display = "flex"; // mostra aviso
+      } else {
+        overlay.style.display = "none"; // esconde e mostra site
+      }
+    } else {
+      overlay.style.display = "none"; // PC não mostra nada
+    }
+  }
+
+  // Verifica quando gira o celular
+  window.addEventListener("orientationchange", checkOrientation);
+  window.addEventListener("resize", checkOrientation);
+
+  // Executa na entrada do site
+  window.addEventListener("load", checkOrientation);
+</script>
+
   </script>
 </body>
 </html>
